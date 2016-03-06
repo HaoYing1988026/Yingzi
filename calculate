@@ -1,0 +1,66 @@
+//HaoYing 2016.3.3 信1301-2班 20132919
+//四则运算小程序
+#include<iostream>
+#include<stdlib.h>
+#include<time.h>
+using namespace std;
+int main()
+{
+	double n[4];
+	int edg,choose,i,next;
+	char mark;
+	srand((int)time(NULL));//变换随机数
+	for(next=0;next<20;next++)//每天设置20道四则运算
+	{
+		for(i=0;i<2;i++)
+		{
+			edg=(rand()%100)%2;
+			if(edg==0)
+				n[i]=rand()%100;//随机数范围【0，100】
+			else
+				n[i]=rand()%100/100.0;//随机真分数
+		}
+		choose=(rand()%100)%4;
+		if(choose==0)
+		{
+			n[2]=n[0]+n[1];
+		    mark='+';
+		}
+		else if(choose==1)
+		{
+			if(n[0]>n[1])
+			{
+				n[2]=n[0]-n[1];
+	            mark='-';
+			}
+			else
+			{
+				n[3]=n[0];
+			    n[0]=n[1];
+		        n[1]=n[3];//使被减数大于减数
+			    n[2]=n[0]-n[1];
+		        mark='-';
+			}
+		}
+		else if(choose==2)
+		{
+			n[2]=n[0]*n[1];
+		    mark='*';
+		}
+		else if(choose==3)
+		{
+			while(n[1]==0)//保证除数大于0
+			{				
+				edg=(rand()%100)%2;
+				if(edg==0)
+					n[1]=rand()%100;//随机数范围【0，100】
+				else
+					n[1]=rand()%100/100.0;//随机真分数
+			}
+			n[2]=n[0]/n[1];
+			mark='/';
+		}
+		cout<<n[0]<<mark<<n[1]<<"="<<n[2]<<endl;//显示式子
+	}
+	return 0;
+}
