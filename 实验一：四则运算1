@@ -1,0 +1,59 @@
+//HaoYing 2016.3.3 信1301-2班 20132919
+//四则运算小程序
+#include<iostream>
+#include<stdlib.h>
+#include<time.h>
+using namespace std;
+int main()
+{
+	double n[4];
+	int edg,choose,i,next,a,b;
+	char mark;
+	srand((int)time(NULL));//变换随机数
+	for(next=0;next<20;next++)//每天设置20道四则运算
+	{
+		edg=(rand()%100)%2;
+		if(edg==0)
+			cout<<rand()%100;//随机数范围【0，100】
+		else
+		{
+			a=rand()%100;
+		    b=1+rand()%100;
+			if(a>b)
+				cout<<"("<<a<<"/"<<b<<")";
+			else
+				cout<<"("<<a<<"/"<<b<<")";
+		}
+		choose=(rand()%100)%4;
+		if(choose==0)
+		{
+		    cout<<'+';
+		}
+		else if(choose==1)
+		{
+			cout<<'-';
+		}
+		else if(choose==2)
+		{
+		    cout<<'*';
+		}
+		else
+		{
+			cout<<'/';
+		}
+		edg=(rand()%100)%2;
+		if(edg==0)
+			cout<<rand()%100<<endl;//随机数范围【0，100】
+		else
+		{
+			a=rand()%100;
+		    b=1+rand()%100;
+			if(a>b)
+				cout<<"("<<a<<"/"<<b<<")"<<endl;
+			else
+				cout<<"("<<a<<"/"<<b<<")"<<endl;
+		}
+	}
+	return 0;
+}
+
