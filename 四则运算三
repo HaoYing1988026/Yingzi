@@ -1,0 +1,1036 @@
+//2016 3.14 Cheng Qiqin HaoYing
+//四则运算三
+#include <iostream>
+#include<ctime>
+#include<cstdlib>
+#include<iomanip>
+#include<fstream>
+using namespace std;
+
+void proNum(int &ProNum)//确定题目数量
+{
+	cout<<"请输入运算式的数量： ";
+	cin>>ProNum;
+	if(ProNum<1)
+	{
+		cout<<"输入错误,";
+		proNum(ProNum);
+	}
+}
+
+//void typeway(int &type)//确定打印方式
+//{
+//	cout<<"请输入打印方式(1、输出到屏幕 2、输出到文件): ";
+//    cin>>type;
+//	if(type>2||type<1)
+//	{
+//		cout<<"输入错误,";
+//		typeway(type);
+//	}
+//}
+
+void ismulAndDiv(int &isMulAndDiv)//确定是否有乘除法
+{
+	cout<<"是否有乘除法（1、是  2、否）:";
+	cin>>isMulAndDiv;
+	if(isMulAndDiv<1||isMulAndDiv>2)
+	{
+		cout<<"输入错误,";
+		ismulAndDiv(isMulAndDiv);
+	}
+}
+
+int operationSymbol(int &isMulAndDiv)//确定是否有乘除法
+{
+	if(isMulAndDiv==1)
+	{
+		return 4;
+	}
+	else
+	{
+		return 2;
+	}
+}
+
+void isparenthese(int &isParenthese)//确定是否有括号
+{
+	cout<<"是否有括号（1、是  2、否）: ";
+	cin>>isParenthese;
+	if(isParenthese<1||isParenthese>2)
+	{
+		cout<<"输入错误,";
+		isparenthese(isParenthese);
+	}
+}
+
+void isneg(int &isNeg)//确定加减有无负数
+{
+	cout<<"加减有无负数（1、有  2、无）: ";
+	cin>>isNeg;
+	if(isNeg<1||isNeg>2)
+	{
+		cout<<"输入错误,";
+		isneg(isNeg);
+	}
+}
+
+void isremainder(int &isRemainder)//确定除法有无余数
+{	
+	cout<<"除法有无余数（1、有  2、无）: ";
+	cin>>isRemainder;
+	if(isRemainder<1||isRemainder>2)
+	{
+		cout<<"输入错误,";
+		isremainder(isRemainder);
+	}
+}
+
+void upperLimit(int &RangeNum)//确定数值的范围
+{
+	cout<<"请输入数值范围："<<endl;
+	cout<<"请输入上限：";
+	cin>>RangeNum;
+	while(RangeNum<1){
+		cout<<"输入错误，请重新输入!"<<endl;
+	    upperLimit(RangeNum);
+	}
+}
+
+void DivisorNotZore(int &Divisor,int RangeNum)//排除除数为0
+{
+	while(Divisor==0)
+	{
+		Divisor=rand()%RangeNum;
+	}
+}
+
+void Neg(int number1,int &number2,int RangeNum)//排除形如a-b结果为负的情况
+{
+	while(number1<number2)
+	{
+		number2=rand()%RangeNum;
+	}
+}
+
+void Remainder(int number1,int &number2,int RangeNum)//排除有余数的情况
+{
+	while((number1%number2)!=0)
+	{ 
+		number2=rand()%RangeNum;
+		DivisorNotZore(number2,RangeNum);
+	}
+}
+
+void properFraction(int &number1,int &number2)//将分数化简
+{
+	int m=0;
+	if(number1<0)
+	{
+		number1=0-number1;
+		while(m<=number1) 
+		{
+			for(m=2;m<=number1;m++)//寻找分子分母公约数，并且约分
+			{
+				if(number1%m==0&&number2%m==0)
+				{
+					number1=number1/m;
+					number2=number2/m;
+					m=2;
+					break;
+				}
+			}
+		}
+		number1=0-number1;
+	}
+	else
+	{
+		while(m<=number1) 
+		{
+			for(m=2;m<=number1;m++)
+			{
+				if(number1%m==0&&number2%m==0)
+				{
+					number1=number1/m;
+					number2=number2/m;
+					m=2;
+					break;
+				}
+			}
+		}
+	}
+}
+
+int main()
+{
+	srand((int)time(0));    //设定时间种子
+	int userChoose[6];      //保存用户意志
+	int ProNum/*,type*/,isMulAndDiv,isParenthese,RangeNum,isNeg,isRemainder;
+	int number[1000][10],Prolength[100],Rbr=0,num,i,j,n; //number[1000][10]用于存放每个表达式中数字,Prolength[100]用于记录表达式的长度
+	char Problems[1000][100];// Problems[1000][100]用于存放表达式
+	char fuhao[4]={'+','-','*','/'};//用于存放操作符号
+	int result[1000][2],resultNum[2];
+	char input[100];
+	int isInput[2];
+	int NumOfRightPro=0;
+	proNum(ProNum);
+	userChoose[0]=ProNum;
+	//typeway(type);
+	ismulAndDiv(isMulAndDiv);
+	userChoose[1]=isMulAndDiv;
+	isparenthese(isParenthese);
+	userChoose[2]=isParenthese;
+	isneg(isNeg);
+	userChoose[3]=isNeg;
+	if(isMulAndDiv==1)//选择了有乘除法才需要考虑是否有余数的问题
+	{
+		isremainder(isRemainder);
+	}
+	upperLimit(RangeNum);
+
+	if(isParenthese==1)//有括号
+	{
+		for(i=0;i<ProNum;i++)
+		{
+			num=rand()%8+2;//随机得出每个表达式中数的个数
+			j=0;
+			int leftParenthese[100],loc=0;
+			if(num==2)//运算式中只有两个数时，不需要括号
+			{
+				for(n=0;n<num;n++)
+				{
+					Problems[i][j]='n';
+					number[i][n]=rand()%RangeNum;
+					if(Problems[i][j-1]=='/')//排除除号后面的数为0的情况
+					{
+						DivisorNotZore(number[i][n],RangeNum);
+					} 
+					j++;
+					if(n<num-1)//添加运算符
+					{
+						Problems[i][j]=fuhao[rand()%operationSymbol(isMulAndDiv)];
+						j++;
+					}
+				}
+				result[i][0]=number[i][0];
+				result[i][1]=1;
+				switch(Problems[i][j-2])//将两数运算结果存放到result[i][0]中
+				{
+				case '+':
+					result[i][0]=result[i][0]+number[i][1];
+					break;
+				case '-':
+					if(isNeg==2)//如果选择没有负数
+					{
+						Neg(number[i][0],number[i][1],RangeNum);
+					}
+					result[i][0]=result[i][0]-number[i][1];
+					break;
+				case '*':
+					result[i][0]=result[i][0]*number[i][1];
+					break;
+				case '/':
+					if(isRemainder==2)//如果选择没有余数
+					{
+						Remainder(number[i][0],number[i][1],RangeNum);
+						result[i][0]=result[i][0]/number[i][1];
+					}
+					else//如果选择有余数
+					{
+						if(number[i][0]%number[i][1]==0)//两数相除可以除尽
+						{
+							result[i][0]=number[i][0]/number[i][1];
+						}
+						else//两数相除结果为分数
+						{ 
+							result[i][1]=number[i][1];
+							properFraction(result[i][0],result[i][1]);
+						}
+					}
+					break;
+				default:
+					break;
+				}
+				Prolength[i]=j;//记录运算式的长度
+			}
+			else//运算式中数超过两个，出现括号
+			{
+				for(n=0;n<num;n++)
+				{ 
+					while(rand()%2)//添加左括号
+					{
+						Rbr++;
+						Problems[i][j]='(';
+						leftParenthese[loc]=j;
+						loc++;
+						j++;
+					}
+					Problems[i][j]='n';
+					number[i][n]=rand()%RangeNum;
+					if(Problems[i][j-1]=='/')//排除除号后面的数为0的情况
+					{
+						DivisorNotZore(number[i][n],RangeNum);
+					}
+					j++;
+					while(rand()%2==0)//添加右括号
+					{
+						if(Rbr>0)
+						{
+							Rbr--;
+							loc--;
+							if(Problems[i][j-2]=='(')//排除形如（20）的情况
+							{
+								Problems[i][j-2]=Problems[i][j-1]; 
+								j--; 
+							}
+							 else
+							{ 
+								if(Problems[i][leftParenthese[loc]]=='('&&Problems[i][leftParenthese[loc]+1]=='('&&Problems[i][j-1]==')')//排除无意义的括号
+								{
+									for(int loction=leftParenthese[loc];loction<j-1;loction++)
+									{
+										Problems[i][loction]=Problems[i][loction+1]; 
+									}
+									j--; 
+								}
+								else
+								{
+									Problems[i][j]=')'; 
+									j++;
+								}
+							} 
+						}
+						else{
+							break;
+						}
+					}
+					if(n<num-1)//添加运算符
+					{
+						Problems[i][j]=fuhao[rand()%operationSymbol(isMulAndDiv)];
+						if(j>4)//根据小学六年级数学，排除连续三个以上乘号和除号出现
+						{
+							if(Problems[i][j]=='/'&&Problems[i][j-2]=='/'&&Problems[i][j-4]=='/')
+							{
+								Problems[i][j]=fuhao[rand()%3];
+							}
+							if(Problems[i][j]=='*'&&Problems[i][j-2]=='*'&&Problems[i][j-4]=='*')
+							{
+								Problems[i][j]='+';
+							}
+						}
+						j++;
+					}
+				}
+				while(Rbr>0)//保证左括号数量与右括号数量相等
+				{
+					Rbr--;
+					loc--;
+					if(Problems[i][j-2]=='(')//排除括号形如（20）的情况
+					{
+						Problems[i][j-2]=Problems[i][j-1]; 
+						j--; 
+					}
+					else//排除无意义的括号
+					{
+						if(Problems[i][leftParenthese[loc]]=='('&&Problems[i][leftParenthese[loc]+1]=='('&&Problems[i][j-1]==')')
+						{
+							for(int loction=leftParenthese[loc];loction<j-1;loction++)
+							{
+								Problems[i][loction]=Problems[i][loction+1]; 
+							}
+							j--; 
+						}
+						else
+						{
+							Problems[i][j]=')'; 
+							j++;
+						}
+					} 
+				}
+				Prolength[i]=j;
+								int operand[10][2],op=0,t=0;
+				int k=0,m=0;
+				int getNeg=0;
+				char operation[100];
+			    if(isMulAndDiv==2)
+				{
+					while(k<j)
+					{
+						operation[m]=Problems[i][k];
+						if(operation[m]=='(')
+						{
+							m++; 
+						}
+						else if(operation[m]=='n')
+						{
+							operand[op][0]=number[i][t];
+							op++;
+							if(op>1)
+							{
+								if(operation[m-2]=='n')
+								{
+									switch(operation[m-1])
+									{
+									case '+':
+										operand[op-2][0]=operand[op-2][0]+operand[op-1][0];
+										break;
+									case '-':
+										if(isNeg==2)
+										{
+											Neg(operand[op-2][0],number[i][t],RangeNum);
+											operand[op-1][0]=number[i][t];
+										}
+										operand[op-2][0]=operand[op-2][0]-operand[op-1][0];
+										break;
+									default:
+										break;
+									}
+								    m=m-1; 
+									op--;
+									t++;
+								}
+								else
+								{
+									m++;
+									t++;
+								}
+							}
+							else
+							{
+								m++;
+								t++;
+							}
+						}
+						else if(operation[m]==')')
+						{
+							operation[m-2]=operation[m-1];
+							m=m-1; 
+							if(op>1)
+							{
+								if(operation[m-3]=='n')
+								{
+									switch(operation[m-2])
+									{
+									case '+':
+										operand[op-2][0]=operand[op-2][0]+operand[op-1][0];
+										break;
+									case '-':
+										operand[op-2][0]=operand[op-2][0]-operand[op-1][0];
+										if(isNeg==2)
+										{
+											if(operand[op-2][0]<0)
+											{
+												getNeg=1;
+												break;
+											}
+										}
+										break;
+									default:
+										break;
+									}
+								    m=m-2;
+								    op--;
+								}
+							}
+						}
+						else
+						{
+							m++; 
+						}
+						k++;
+					}
+				}
+				
+				//下面注释掉的内容为括号中有乘除的计算过程
+
+			//	else
+			//	{
+			//		while(k<j)
+			//		{
+			//			operation[m]=Problems[i][k];
+			//			if(operation[m]=='(')
+			//			{
+			//				m++; 
+			//			}
+			//			else if(operation[m]=='n')
+			//			{
+			//				operand[op][0]=number[i][t];
+			//				operand[op][0]=1;
+			//				op++;
+			//				if(op>1)
+			//				{
+			//					if(operation[m-2]=='n')
+			//					{
+			//						switch(operation[m-1])
+			//						{
+			//						case '+':
+			//							if(op>2)
+			//							{
+			//								if(operation[m-4]=='n')
+			//								{
+			//									switch(operation[m-3])
+			//									{
+			//									case '+':
+			//										operand[op-3][0]=operand[op-3][0]*operand[op-2][1]+operand[op-2][0]*operand[op-3][1];
+			//										operand[op-3][1]=operand[op-3][1]*operand[op-2][1];
+			//										operand[op-2][0]=operand[op-1][0];
+			//										operand[op-2][1]=operand[op-1][1];
+			//										operation[m-3]=operation[m-1];
+			//										operation[m-2]=operation[m];
+			//										break;
+			//									case '-':
+			//										operand[op-3][0]=operand[op-3][0]*operand[op-2][1]+operand[op-2][0]*operand[op-3][1];
+			//										operand[op-3][1]=operand[op-3][1]*operand[op-2][1];
+			//										operand[op-2][0]=operand[op-1][0];
+			//										operand[op-2][1]=operand[op-1][1];
+			//										operation[m-3]=operation[m-1];
+			//										operation[m-2]=operation[m];
+			//										break;
+			//									case '*':
+			//										operand[op-2][0]=operand[op-2][0]*operand[op-1][0];
+			//										operand[op-2][1]=operand[op-2][1]*operand[op-1][1];
+			//										operation[m-2]=operation[m];
+			//										break;
+			//									case '/':
+			//										operand[op-2][0]=operand[op-2][0]*operand[op-1][1];
+			//										operand[op-2][1]=operand[op-2][1]*operand[op-1][0];
+			//										operation[m-2]=operation[m];
+			//										break;
+			//									default:
+			//										break;
+			//									}
+			//									m--;
+			//									op--;
+			//								}
+			//								else
+			//								{
+			//									m++; 
+			//								}
+			//							}
+			//							else
+			//							{
+			//								m++;
+			//							}
+			//							t++;
+			//							break;
+			//						case '-':
+			//							if(op>2)
+			//							{
+			//								if(operation[m-4]=='n')
+			//								{
+			//									switch(operation[m-3])
+			//									{
+			//									case '+':
+			//										operand[op-3][0]=operand[op-3][0]*operand[op-2][1]-operand[op-2][0]*operand[op-3][1];
+			//										operand[op-3][1]=operand[op-3][1]*operand[op-2][1];
+			//										operand[op-2][0]=operand[op-1][0];
+			//										operand[op-2][1]=operand[op-1][1];
+			//										operation[m-3]=operation[m-1];
+			//										operation[m-2]=operation[m];
+			//										break;
+			//									case '-':
+			//										operand[op-3][0]=operand[op-3][0]*operand[op-2][1]-operand[op-2][0]*operand[op-3][1];
+			//										operand[op-3][1]=operand[op-3][1]*operand[op-2][1];
+			//										operand[op-2][0]=operand[op-1][0];
+			//										operand[op-2][1]=operand[op-1][1];
+			//										operation[m-3]=operation[m-1];
+			//										operation[m-2]=operation[m];
+			//										break;
+			//								    case '*':
+			//										operand[op-2][0]=operand[op-2][0]*operand[op-1][0];
+			//										operand[op-2][1]=operand[op-2][1]*operand[op-1][1];
+			//										operation[m-2]=operation[m];
+			//										break;
+			//									case '/':
+			//										operand[op-2][0]=operand[op-2][0]*operand[op-1][1];
+			//										operand[op-2][1]=operand[op-2][1]*operand[op-1][0];
+			//										operation[m-2]=operation[m];
+			//										break;
+			//									default:
+			//										break;
+			//									}
+			//									m--;
+			//									op--;
+			//								}
+			//								else
+			//								{
+			//									m++; 
+			//								}
+			//							}
+			//							else
+			//							{
+			//								m++;
+			//							}
+			//							t++;
+			//							break;
+			//							break;
+			//						case '*':
+			//							operand[op-2][0]=operand[op-2][0]*operand[op-1][0];
+			//							operand[op-2][1]=operand[op-2][1]*operand[op-1][1];
+			//							operation[m-2]=operation[m]; 
+			//							t++;
+			//							m--;
+			//							op--;
+			//							break;
+			//						case '/':
+			//							operand[op-2][1]=operand[op-2][1]*operand[op-1][0];
+			//							operand[op-2][0]=operand[op-2][0]*operand[op-1][1];
+			//							operation[m-2]=operation[m];
+			//							t++;
+			//							op--;
+			//							m--;
+			//							break;
+			//						default:
+			//							break;
+			//						}
+			//					}
+			//					else
+			//					{
+			//						m++;
+			//						t++;
+			//					}
+			//				}
+			//				else
+			//				{
+			//					m++;
+			//					t++;
+			//				}
+			//			}
+			//			else if(operation[m]==')')
+			//			{
+			//				if(operation[m]=='(')
+			//				{
+			//					operation[m-2]=operation[m-1];
+			//				    m=m-1; 
+			//				}
+			//				else
+			//				{
+			//					switch(operation[m-2])
+			//					{
+			//					case '+': 
+			//						operand[op-2][0]=operand[op-2][0]*operand[op-1][1]+operand[op-1][0]*operand[op-2][1];
+			//						operand[op-2][1]=operand[op-2][1]*operand[op-1][1];
+			//						break;
+			//					case '-':
+			//						operand[op-2][0]=operand[op-2][0]*operand[op-1][1]-operand[op-1][0]*operand[op-2][1];
+			//						operand[op-2][1]=operand[op-2][1]*operand[op-1][1]
+			//						break;
+			//					default:
+			//						break;
+			//					}
+			//					operation[m-4]=operation[m-3];
+			//					op--;
+			//					m=m-3;
+			//				}
+			//				if(operation[m-2]=='n')
+			//				{
+			//					switch(operation[m-1])
+			//					{
+			//					case '*': 
+			//						operand[op-2][0]=operand[op-2][0]*operand[op-1][0];
+			//						operand[op-2][1]=operand[op-2][1]*operand[op-1][1];
+			//						break;
+			//					case '/':
+			//						operand[op-2][0]=operand[op-2][0]*operand[op-1][1];
+			//						operand[op-2][1]=operand[op-2][1]*operand[op-1][0];
+			//						break;
+			//					default:
+			//						break;
+			//					}
+			//					operation[m-2]=operation[m];
+			//					op--;
+			//					m=m-2;
+			//				}
+			//				
+			//			}
+			//			else
+			//			{
+			//				m++; 
+			//			}
+			//			k++;
+			//		}
+			//	}
+			//	if(op==1){
+			//		result[i][0]=operand[0][0];
+			//		result[i][1]=operand[0][1];
+			//	}
+			//	else
+			//	{
+			//		int a=0;
+			//		while(a+1<op)
+			//		{
+			//			switch(operation[2*a+1])
+			//			{
+			//				case '+': 
+			//					operand[a+1][0]=operand[a+1][0]*operand[a][1]+operand[a][0]*operand[a+1][1];
+			//					operand[a+1][1]=operand[a+1][1]*operand[a][1];
+			//					break;
+			//				case '-':
+			//					operand[a+1][0]=operand[a+1][0]*operand[a][1]-operand[a][0]*operand[a+1][1];
+			//					operand[a+1][1]=operand[a+1][1]*operand[a][1];
+			//					break;
+			//				default:
+			//					break;
+			//			}
+			//			a++;
+			//		}
+			//		result[i][0]=operand[a][0];
+			//		result[i][1]=operand[a][0];
+			//	}
+			//}
+				result[i][0]=operand[0][0];
+				result[i][1]=1;
+				if(getNeg==1)
+				{
+					i--;
+				}
+			}//lll
+			for(int k=0;k<i;k++)//排除运算式重复
+			{
+				if(Problems[k]==Problems[i])
+				{
+					i--;
+					break;
+				}
+			}
+		}
+	}
+	else//运算式不出现括号
+	{
+		for(i=0;i<ProNum;i++)//算式个数为ProNum
+		{
+			num=rand()%8+2; 
+			j=0;
+			for(n=0;n<num;n++)//单个式子的数字个数为num
+			{
+				Problems[i][j]='n';//将字符串中数字部分先用n来代替
+				number[i][n]=rand()%RangeNum;
+				if(Problems[i][j-1]=='/')//排除除号后面的数为0的情况
+				{
+					DivisorNotZore(number[i][n],RangeNum);
+				}
+				j++;
+				if(n<num-1)//添加运算符
+				{
+					Problems[i][j]=fuhao[rand()%operationSymbol(isMulAndDiv)];
+					if(j>4)//排除三个乘号和除号的出现
+					{
+						if(Problems[i][j]=='/'&&Problems[i][j-2]=='/'&&Problems[i][j-4]=='/')
+						{
+							Problems[i][j]=fuhao[rand()%3];//转换成其它符号输出
+						}
+						if(Problems[i][j]=='*'&&Problems[i][j-2]=='*'&&Problems[i][j-4]=='*')
+						{
+							Problems[i][j]='+';
+						}
+					}
+					j++;
+				}
+			}
+			Prolength[i]=j;//记录运算式的长度
+			for(int k=0;k<i;k++)//排除重复
+			{
+				if(Problems[k]==Problems[i])
+				{
+					i--;
+					break;
+				}
+			}
+			int loc=1,loc1=1;
+			result[i][0]=number[i][0];
+			result[i][1]=1;
+			if(isMulAndDiv==2)//如果选择没有乘除
+			{
+			    while(loc1<j-1)
+				{
+					switch(Problems[i][loc1])
+					{
+					case '+':
+						result[i][0]=result[i][0]+number[i][loc];
+						break;
+					case '-':
+						if(isNeg==2)//如果选择没有负数
+						{
+							Neg(result[i][0],number[i][loc],RangeNum);
+						}
+						result[i][0]=result[i][0]-number[i][loc];
+						if(result[i][0]==0)//式子运算中前面结果为0
+						{
+							if(isNeg==2)//如果没有负数，则添加加号使其为正
+							{
+								Problems[i][loc1+2]='+';
+							}
+						}
+						break;
+					default:
+						break;
+					}
+					loc++;
+					loc1=loc1+2;
+				}
+			}
+			else//如果选择有乘除
+			{ 
+				resultNum[0]=number[i][loc];
+				resultNum[1]=1;
+				while(loc1<j-1)
+				{
+					int n=0;
+					int resultBeforeSub[2];
+					switch(Problems[i][loc1])
+					{
+					case '+': 
+						if((2*loc+1)<j-1)
+						{
+							if(Problems[i][2*loc+1]=='*')//加号后面如果出现乘号
+							{
+								resultNum[0]=resultNum[0] * number[i][loc+1];//将乘的结果记录到resultNum[0]中 
+								n=1;
+							}
+							if(Problems[i][2*loc+1]=='/')//加号后面如果出现除号
+							{
+								if(isRemainder==2)//如果选择没有余数
+								{
+									Remainder(resultNum[0],number[i][loc+1],RangeNum); 
+									resultNum[0]=resultNum[0]/number[i][loc+1]; 
+								}
+								else//如果选择有余数
+								{
+									if(resultNum[0]%number[i][loc+1]==0)//暂存结果可以除尽
+									{
+										resultNum[0]=resultNum[0]/number[i][loc+1];
+									}
+									else//暂存结果有余数，将其简化成分数形式
+									{ 
+										resultNum[1]=resultNum[1]*number[i][loc+1];
+										properFraction(resultNum[0],resultNum[1]);
+									}
+								}
+								n=1;
+							}
+						}
+						if(n==0)
+						{
+							if(isRemainder==2)//如果选择没有余数
+							{
+								result[i][0]=result[i][0]+resultNum[0];
+							}
+							else//如果选择有余数，利用通分的方法将两分数相加
+							{
+								result[i][0]=result[i][0]*resultNum[1]+resultNum[0]*result[i][1];//分子分母分别相乘再相加
+							    result[i][1]=result[i][1]*resultNum[1];//分母相乘
+							}
+							resultNum[0]=number[i][loc+1];
+							resultNum[1]=1;
+						}
+						break;
+					case '-':
+						if((2*loc+1)<j-1)
+						{
+							if(Problems[i][2*loc+1]=='*')//减号后面出现乘号的情况
+							{
+								resultNum[0]=resultNum[0] * number[i][loc+1]; 
+								n=1;
+							}
+							if(Problems[i][2*loc+1]=='/')//减号后面出现除号的情况
+							{
+								if(isRemainder==2)//如果选择没有余数
+								{
+									Remainder(resultNum[0],number[i][loc+1],RangeNum); 
+									resultNum[0]=resultNum[0]/number[i][loc+1]; 
+								}
+								else//如果选择有余数 
+								{
+									if(resultNum[0]%number[i][loc+1]==0)//如果相除没有余数
+									{
+										resultNum[0]=resultNum[0]/resultNum[0];
+									}
+									else//如果相除有余数，转化成分数保存如resultNum中
+									{ 
+										resultNum[1]=resultNum[1]*number[i][loc+1];
+										properFraction(resultNum[0],resultNum[1]);
+									} 
+								}
+								n=1;
+							}
+						}
+						if(n==0)//减号后面不是乘号或除号
+						{
+							resultBeforeSub[0]=result[i][0];//保存相减之前的结果，避免相减之后出现负数的情况
+							resultBeforeSub[1]=1;
+							if(isRemainder==2)//如果选择没有余数
+							{
+								result[i][0]=result[i][0]-resultNum[0];
+							}
+							else//如果选择出现余数
+							{
+								result[i][0]=result[i][0]*resultNum[1]-resultNum[0]*result[i][1];//分子分母分别相乘再相减
+							    result[i][1]=result[i][1]*resultNum[1];//分母相乘
+							}
+							if(isNeg==2)//如果选择没有负数
+							{
+								while(result[i][0]<0)//直到结果为正，则跳出循环
+								{
+									for(int loc2=(loc1+1)/2;loc2<loc+1;loc2++)
+									{
+										number[i][loc2]=rand()%RangeNum;//改变减数部分式子数的数值
+									}
+									int l=(loc1+1)/2;
+									resultNum[0]=number[i][l];
+									resultNum[0]=1;
+									while(l<loc)//重新计算减数部分的结果
+									{
+										if(Problems[i][2*l+1]=='*')
+										{
+											resultNum[0]=resultNum[0]*number[i][l+1]; 
+										}
+										if(Problems[i][2*l+1]=='/')
+										{
+											if(isRemainder==2)//如果选择没有余数
+											{
+												Remainder(resultNum[0],number[i][l+1],RangeNum); 
+												resultNum[0]=resultNum[0]/number[i][l+1]; 
+											}
+											else//如果选择有余数
+											{
+												resultNum[1]=resultNum[1]*number[i][l+1];
+											} 
+										}
+										l++;
+									}
+									if(isRemainder==2)//如果选择没有余数
+									{
+										result[i][0]=resultBeforeSub[0]+resultNum[0];
+									}
+									else//如果选择有余数
+									{
+										result[i][0]=resultBeforeSub[0]*resultNum[1]+resultNum[0]*resultBeforeSub[1];//通分运算分子部分
+										result[i][1]=resultBeforeSub[1]*resultNum[1];//通分部分分母部分
+									} 
+								}
+							}
+							//properFraction(result[i][0],result[i][1]);
+							resultNum[0]=number[i][loc+1];
+							resultNum[1]=1;
+						}
+						break;
+					case '*':
+						result[i][0]=result[i][0]*resultNum[0];
+						resultNum[0]=number[i][loc+1]; 
+						resultNum[1]=1;
+						break;
+					case '/':
+						if(isRemainder==2)//如果选择没有余数
+						{
+							Remainder(result[i][0],number[i][loc],RangeNum);
+							resultNum[0]=number[i][loc];
+							result[i][0]=result[i][0]/resultNum[0]; 
+						}
+						else//如果选择有余数
+						{
+							if(result[i][0]%resultNum[0]==0)//可以除尽
+							{
+								result[i][0]=result[i][0]/resultNum[0];
+							}
+							else//除不尽，转换为分数且化简
+							{ 
+								result[i][1]=result[i][1]*resultNum[0]; 
+								//properFraction(result[i][0],result[i][1]);
+							}
+						}
+						resultNum[0]=number[i][loc+1]; 
+						resultNum[1]=1;
+						break;
+					default:
+						break;
+					}
+					loc++;
+					if(n==0)
+					{
+						loc1=2*loc-1;
+					}
+				}
+			}
+		}
+	}
+	int s,t,q; 
+	cout<<"答题开始，请在等号后输入你的答案，并按回车键回答下一题！"<<endl;
+	cout<<"若结果为分数，分子分母之间用空格隔开！"<<endl;
+	for(i=0;i<ProNum;i++)//表达式数量
+	{
+		s=0;
+		t=0;
+		q=Prolength[i];
+		if(Problems[i][s]=='('&&Problems[i][q-1]==')')//排除表达式首尾都有括号且无意义时的情况
+		{
+			int m,n=0;
+			bool kuohao=true;
+		    for(m=s;m<q-1;m++)
+			{
+				if(Problems[i][m]=='(')
+				{
+					n++;
+				}
+				if(Problems[i][m]==')')
+				{
+					n--;
+				}
+				if(n==0)
+				{
+					kuohao=false;
+					break;
+				}
+			}
+			if(kuohao)//表达式首尾都有括号且无意义时
+			{
+				s++;
+			    Prolength[i]=Prolength[i]-2;
+			    q=q-1;
+			}
+		}
+		while(Prolength[i]>0)
+		{
+			if(Problems[i][s]=='n')
+			{
+				cout<<number[i][t]; 
+				s++;
+				t++;
+			}
+			else
+			{
+				cout<<Problems[i][s];
+				s++;
+			}
+			Prolength[i]--;
+		}
+		cout<<"=";
+		properFraction(result[i][0],result[i][1]);
+		if(result[i][1]==1)
+		{
+			cin>>isInput[0];
+			if(isInput[0]==result[i][0])
+			{
+				cout<<"恭喜你，答对了！"<<endl;
+				NumOfRightPro++;
+			}
+			else
+			{
+				cout<<"结果错误，正确答案为 "<<result[i][0]<<endl;
+			}
+		}
+		else
+		{
+			cin>>isInput[0]>>isInput[1];
+			if(isInput[0]==result[i][0]&&isInput[1]==result[i][1])
+			{
+				cout<<"恭喜你，答对了！"<<endl;
+				NumOfRightPro++;
+			}
+			else
+			{
+				cout<<"结果错误，正确答案为 "<<result[i][0]<<"/"<<result[i][1]<<endl;
+			}
+		}
+	} 
+	cout<<"答题完毕，你正确回答了"<<NumOfRightPro<<"道题！"<<endl;
+	return 0;
+}
