@@ -1,4 +1,4 @@
-//2016 3.22 Cheng Qiqin  Hao Ying
+//2016 3.24 Cheng Qiqin  Hao Ying
 //返回一个整数数组中最大子数组的和
 
 #include<iostream>
