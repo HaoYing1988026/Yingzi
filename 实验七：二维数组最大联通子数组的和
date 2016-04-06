@@ -1,0 +1,190 @@
+//二维数组最大联通子数组和最大值实验 Hao Ying CengQiqin
+//2016 04 01
+#include<iostream>
+#include<fstream>
+using namespace std;
+
+typedef struct//建立数据结构存放二维数组以及遍历路径
+{
+    int traver[100];
+    int Array[100][100];
+    int row,column;
+}Array;
+
+int Find(Array &arr,int mul)//遍历时用来寻找代价最小的路径
+{ 
+    int i,j;
+    for(i=1;i<=mul;i+=arr.column)
+    { 
+        for(j=i;j<=i+arr.column-2;j++)
+        {
+            arr.Array[j][j+1]=1;
+            arr.Array[j+1][j]=1;
+        }
+    }
+    for(i=1+arr.column;i<mul;i+=arr.column)
+    {
+        for(j=i;j<=i+arr.row-1;j++)
+        {
+            arr.Array[j][j-arr.column]=1;
+            arr.Array[j-arr.column][j]=1;
+        }
+    }
+    return 0;
+}
+int Input(Array &arr)//用于输入二维数组的函数
+{
+    cout<<"请输入行数："<<endl;
+    cin>>arr.row;
+    cout<<"请输入列数："<<endl;
+    cin>>arr.column;
+    cout<<"请输入一个二维数组："<<endl;
+    int mul=arr.row*arr.column;
+    for(int i=1;i<=mul;i++)
+    {
+        cin>>arr.traver[i];
+    }
+        return mul;
+}
+
+int MaxNum(Array &arr,int k, int traverse[], int &a, int &maxarray,int row,int mul)//遍历，找出当前的最大子数组的函数
+{
+    traverse[k]=1;
+    maxarray+=arr.traver[k];
+    if(maxarray>=a)
+    {
+        a=maxarray;
+    }
+    int k1=0,k2=0;
+    for(int j1=1;j1<=mul;j1++)
+    {
+        for(int j2=1;j2<=mul;j2++)
+        {
+            if((traverse[j1]==0)&&(arr.Array[j2][j1]==1)&&(traverse[j2]==1))
+            {
+                k1=j1;
+                k2=1; 
+                break;
+            }
+        }
+        if(k2==1)
+        {
+            break;
+        }
+    }
+    for(int j1=1;j1<=mul;j1++)
+    {
+        for(int j2=1;j2<=mul;j2++)
+        {
+            if((traverse[j1]==0)&&(arr.Array[j2][j1]==1)&&(traverse[j2]==1))
+            {
+                if(arr.traver[k1]<arr.traver[j1])
+                {
+                    k1=j1;
+                }
+            }
+        }
+    }
+    if(a+arr.traver[k1]<0)
+    {
+        arr.Array[k][k1] = 0;
+    }
+    else
+        MaxNum(arr,k1,traverse,a,maxarray,row,mul);
+    return 0;
+}
+int main()
+{
+    ifstream ifile("c:\\input.txt",ios::in);//从c:input.txt文件输入数据
+    Array arr;
+    int p;
+    cout<<"请选择输入方式：1.屏幕输入  2.文件输入  ";
+    cin>>p;
+    if(p==1)
+    {
+        Input(arr);
+    }
+    else if(p==2)
+    {
+        if(ifile.is_open()==false)
+        {
+            cerr<<"open error!"<<endl;
+            exit(1);
+        }
+        cout<<"已从input.txt文件中导入数据！数据如下："<<endl;
+        int p[20],u=0,s=1,c1,c2;
+        char cc[20],i=0;
+        ifile>>c1;
+        cout<<"该数组行数："<<c1<<endl;
+        arr.row=c1;
+        ifile>>c2;
+        cout<<"该数组列数："<<c2<<endl;
+        arr.column=c2;
+        cout<<"该二维数组为："<<endl;
+        for(i=1;i<=18;i++)
+        {
+            ifile>>cc[i];
+            if(cc[i]==',')
+            {
+                cout<<" ";
+            }
+            else
+            {
+                if(cc[i-1]=='-')
+                {
+                    p[s]=0-(cc[i]-48);//将文件中的负数存放起来
+                    cout<<cc[i];
+                    s++;
+                }
+                else
+                {
+                    if(cc[i]!='-')
+                    {
+                        p[s]=cc[i]-48;//将文件中的正数存放起来
+                        s++;
+                    }
+                    cout<<cc[i];
+                }
+            }
+            if(i%6==0)//输出矩阵
+            {
+                cout<<endl;
+            }
+        }
+        ifile.close();
+        for(i=1;i<=arr.row*arr.column;i++)
+        {
+            arr.traver[i]=p[i];//存入数据结构二维数组中
+        }
+    }
+    else
+    {
+        cout<<"ERROR!"<<endl;
+        return 0;
+    }
+    int mul=arr.row*arr.column;
+    Find(arr,mul);
+    int b[100]={0};
+    for(int i=1;i<=mul;i++)//逐个遍历直到找到最大子数组为止
+    {
+        if(arr.traver[i]<0)
+        {
+            b[i]=arr.traver[i];
+        }
+        else
+        {
+            int traverse[100]={0};
+            int maxarray=0;
+            MaxNum(arr,i,traverse,b[i],maxarray,arr.row,mul);
+        }
+    }
+
+    int maxarray = b[1];
+    for(int i=2;i<=mul;i++)
+    {
+        if(b[i]>maxarray)
+            maxarray=b[i];
+    }
+    cout<<"最大联通子数组的和为："<<maxarray<<endl;
+    return 0;
+}
