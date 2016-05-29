@@ -1,0 +1,105 @@
+//Hao Ying 2016/5/18
+//找出贴吧中的水王
+#include<iostream>
+using namespace std;
+
+typedef struct node//定义链表中的成员
+{
+    int arr;//链表中的节点
+    struct node *pNext;//指向下一节点的指针
+}Node,*pNode;
+
+pNode CreateList(int);//创建链表
+int deledata(pNode,int);//删除链表
+int Returnval(pNode,int);//返回ID值
+int traver(pNode);//遍历重整
+int main()
+{
+    int i=0,num,num1;
+    pNode pHead=NULL;//定义初始化头结点
+    cout<<"请输入帖子数（一维数组的长度）：";
+    cin>>num;
+    num1=num;
+    pHead=CreateList(num);
+    traver(pHead);
+    do
+    {
+        if(num1=3)//若出现三个数中前两个数相同导致剩下两个数无法判断水王的情况，则跳出循环，令第一个节点成为水王
+            if(Returnval(pHead,0)==Returnval(pHead,1))
+                break;
+        for(i=0;i<num1/2;i=i+2)//从第一个节点起相邻两个数进行比较
+        {
+            if(Returnval(pHead,i)!=Returnval(pHead,i+1))//若两数不相同则将两个节点同时删除
+            {
+                deledata(pHead,i);
+                deledata(pHead,i+1);
+            }
+            else//若两数相同则保留前者
+            {
+                deledata(pHead,i);
+            }
+        }
+        num1=traver(pHead);
+    }while(num1!=1);//循环直到链表中只剩下一个数为止
+    cout<<"该贴吧的水王为："<<Returnval(pHead,0)<<endl;
+    return 0;
+}
+pNode CreateList(int num)//创建链表函数
+{
+    int i,val;//i用于循环，val存放链表相应位置的值
+    cout<<"请输入一组帖子ID（一维数组）：";
+    pNode pHead=(pNode)malloc(sizeof(Node));//分配一个不存放有效数据的头结点
+    pNode pTail=pHead;
+    pTail->pNext=NULL;//尾指针指向空
+    for(i=0;i<num;i++)
+    {
+        cin>>val;
+        pNode pNew=(pNode)malloc(sizeof(Node));//为节点分配空间
+        pNew->arr=val;//将值赋予节点成员
+        pTail->pNext=pNew;//尾指针指向新节点
+        pNew->pNext=NULL;//新节点指针置为空
+        pTail=pNew;//新节点赋予最后一个节点
+    }
+    return pHead;
+}
+int deledata(pNode pHead,int back)//删除节点函数
+{
+    int i=0,data;
+    pNode _node=pHead;
+    pNode pSwap;
+    while(i<back-1)
+    {
+        _node=_node->pNext;
+        ++i;
+    }
+    pSwap=_node->pNext;
+    data=pSwap->arr;
+    _node->pNext=_node->pNext->pNext;
+    free(pSwap);
+    return data;
+}
+int Returnval(pNode pHead,int num1)//返回节点值函数
+{
+    int i=0,data;
+    pNode _node=pHead;
+    pNode pval;
+    while(i<num1)
+    {
+        _node=_node->pNext;
+        ++i;
+    }
+    pval=_node->pNext;
+    data=pval->arr;
+    return data;
+}
+int traver(pNode pHead)//遍历函数
+{
+    int i=0;
+    pNode p=pHead->pNext;
+    while(NULL!=p)
+    {
+        p=p->pNext;
+        ++i;
+    }
+    return i;
+}
