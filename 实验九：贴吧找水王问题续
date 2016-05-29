@@ -1,0 +1,74 @@
+//Ying Hao 2016/5/27
+//找出贴吧中数目均超过四分之一的三个水王 
+#include <iostream>
+using namespace std;
+int main()
+{
+    int N,i,arr[1000],num=0,num1=0,num2=0,a[3]={0,0,0};//arr[]用来存放ID，num,num1,num2存放暂定水王的数目，a[]用来存放暂定水王
+    do
+    {
+        cout<<"请输入ID数：";
+        cin>>N;
+        if(N==3)//若只有三个ID，则这三个ID就是水王
+        {
+            break;
+        }
+        if(N<7)//小于7个ID不可能出现水王
+        {
+            cout<<"请输入合适的ID数!（输入的数目不存在3个水王！）"<<endl;
+        }
+    }while(N<7);
+    cout<<"请输入ID：";
+    for(i=0;i<N;i++)
+    {
+        cin>>arr[i];
+    }
+    if(N!=3)
+    {
+        for(i=0;i<N;i++)//
+        {
+            if(a[0]==arr[i])
+            {
+                num++;
+            }
+            else if(a[1]==arr[i])
+            {
+                num1++;
+            }
+            else if(a[2]==arr[i])
+            {
+                num2++;
+            }
+            else if(num==0)
+            {
+                a[0]=arr[i];
+                num++;
+            }
+            else if(num1==0)
+            {
+                a[1]=arr[i];
+                num1++;
+            }
+            else if(num2==0)
+            {
+                a[2]=arr[i];
+                num2++;
+            }
+            else 
+            {
+                num--;
+                num1--;
+                num2--;
+            }
+        }
+    }
+    else
+    {
+        a[0]=arr[0];
+        a[1]=arr[1];
+        a[2]=arr[2];
+    }
+    cout<<"这三个水王分别是："<<a[0]<<","<<a[1]<<","<<a[2];
+    cout<<endl;
+    return 0;
+}
