@@ -1,0 +1,47 @@
+//Hao Ying 2016/6/2
+//购书最低价实验
+#include<iostream>
+using namespace std;
+int main()
+{
+	int i,number,a,b;
+	double price;
+	cout<<"请输入书本数：";
+	cin>>number;
+	a=number/10;
+	b=number%10;
+	if(b==0)
+	{
+		price=10*a*8*0.75;
+	}
+	else if(b>0&&b<10&&b!=8)
+	{
+		if(b%5==0)
+		{
+			price=10*a*8*0.75+(b/5)*5*8*0.75+(b%5)*8*0.75;
+		}
+		else if(b%5==1)
+		{
+			price=10*a*8*0.75+(b/5)*5*8*0.75+(b%5)*8;
+		}
+		else if(b%5==2)
+		{
+			price=10*a*8*0.75+(b/5)*5*8*0.75+2*8*0.95;
+		}
+		else if(b%5==3)
+		{
+			price=10*a*8*0.75+(b/5)*5*8*0.75+3*8*0.9;
+		}
+		else if(b%5==4)
+		{
+			price=10*a*8*0.75+(b/5)*5*8*0.75+4*8*0.8;
+		}
+	}
+	else if(b==8)
+	{
+		price=10*a*8*0.75+8*8*0.8;
+	}
+	cout<<"读者购买这批书的最低价格为："<<price;
+	cout<<endl;
+	return 0;
+}
